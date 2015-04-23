@@ -50,6 +50,9 @@ var requirejs, require, define;
      * Helper function for iterating over an array. If the func returns
      * a true value, it will break out of the loop.
      */
+    /**
+     * 遍历数组，对数组中每一个数据执行func函数，当func函数返回true类型的值时跳出循环
+     */
     function each(ary, func) {
         if (ary) {
             var i;
@@ -65,6 +68,9 @@ var requirejs, require, define;
      * Helper function for iterating over an array backwards. If the func
      * returns a true value, it will break out of the loop.
      */
+    /**
+     * 反向遍历数组，对数组中每一个数据执行func函数，当func函数返回true类型的值时跳出循环
+     */
     function eachReverse(ary, func) {
         if (ary) {
             var i;
@@ -76,10 +82,16 @@ var requirejs, require, define;
         }
     }
 
+    /**
+     * prop是否是obj的自有属性，是：返回true，否：返回false
+     */
     function hasProp(obj, prop) {
         return hasOwn.call(obj, prop);
     }
 
+    /**
+     * 获取obj的自有属性prop，若prop是obj的自有属性，返回obj[prop]，否则返回false
+     */
     function getOwn(obj, prop) {
         return hasProp(obj, prop) && obj[prop];
     }
@@ -88,6 +100,9 @@ var requirejs, require, define;
      * Cycles over properties in an object and calls a function for each
      * property value. If the function returns a truthy value, then the
      * iteration is stopped.
+     */
+    /**
+     * 遍历obj对象的所有自有属性，执行func函数，若func函数返回true类型的值，跳出循环
      */
     function eachProp(obj, func) {
         var prop;
@@ -103,6 +118,10 @@ var requirejs, require, define;
     /**
      * Simple function to mix in properties from source into target,
      * but only if target does not already have a property of the same name.
+     */
+    /**
+     * 将source合并进target,如果target没有source的某个属性，或者指定force为true时，才会将source的属性覆盖target的同名属性,
+     * 若指定deepStringMixin为true，将对下层的对象继续进行合并
      */
     function mixin(target, source, force, deepStringMixin) {
         if (source) {
@@ -127,22 +146,33 @@ var requirejs, require, define;
 
     //Similar to Function.prototype.bind, but the 'this' object is specified
     //first, since it is easier to read/figure out what 'this' will be.
+    /**
+     * 将fn调用时的this指定为obj
+     */
     function bind(obj, fn) {
         return function () {
             return fn.apply(obj, arguments);
         };
     }
 
+    /**
+     * 获取所有script标签
+     */
     function scripts() {
         return document.getElementsByTagName('script');
     }
 
+    //抛出错误
     function defaultOnError(err) {
         throw err;
     }
 
     //Allow getting a global that is expressed in
     //dot notation, like 'a.b.c'.
+    /**
+     * 获取全局对象
+     * 举例：当value = 'a.b.c'时，返回值为global['a']['b']['c']
+     */
     function getGlobal(value) {
         if (!value) {
             return value;
@@ -162,6 +192,9 @@ var requirejs, require, define;
      *
      * @returns {Error}
      */
+    /**
+     * 创建Error对象
+     */
     function makeError(id, msg, err, requireModules) {
         var e = new Error(msg + '\nhttp://requirejs.org/docs/errors.html#' + id);
         e.requireType = id;
@@ -172,12 +205,19 @@ var requirejs, require, define;
         return e;
     }
 
+    /**
+     * 如果define已经存在，则结束本脚本
+     */
     if (typeof define !== 'undefined') {
         //If a define is already in play via another AMD loader,
         //do not overwrite.
         return;
     }
 
+    /**
+     * 如果requirejs已经存在并且是函数类型，则结束本脚本，
+     * 如果不是函数类型，则用cfg来保存原来的requirejs，并将requirejs变量重置为undefined
+     */
     if (typeof requirejs !== 'undefined') {
         if (isFunction(requirejs)) {
             //Do not overwrite an existing requirejs instance.
@@ -188,6 +228,10 @@ var requirejs, require, define;
     }
 
     //Allow for a require config object
+    /**
+     * 如果require变量已经存在并且不是函数类型，
+     * 则用cfg来保存原来的require，并且将require变量重置为undefined
+     */
     if (typeof require !== 'undefined' && !isFunction(require)) {
         //assume it is a config object.
         cfg = require;
@@ -230,6 +274,9 @@ var requirejs, require, define;
          * all paths that use this function should look normalized.
          * NOTE: this method MODIFIES the input array.
          * @param {Array} ary the array of path segments.
+         */
+        /**
+         * 把文件路径拆成数组传入该函数，该函数会把包含.和..的路径进行处理
          */
         function trimDots(ary) {
             var i, part;
@@ -280,6 +327,10 @@ var requirejs, require, define;
                 // of IDs. Have to do this here, and not in nameToUrl
                 // because node allows either .js or non .js to map
                 // to same file.
+                /**
+                 * node在定位文件的时候可以选择带或不带.js后缀
+                 * 统一去除.js后缀，以便兼容浏览器和node
+                 */
                 if (config.nodeIdCompat && jsSuffixRegExp.test(name[lastIndex])) {
                     name[lastIndex] = name[lastIndex].replace(jsSuffixRegExp, '');
                 }
@@ -353,6 +404,9 @@ var requirejs, require, define;
             return pkgMain ? pkgMain : name;
         }
 
+        /**
+         * 移除指定name的script标签
+         */
         function removeScript(name) {
             if (isBrowser) {
                 each(scripts(), function (scriptNode) {
